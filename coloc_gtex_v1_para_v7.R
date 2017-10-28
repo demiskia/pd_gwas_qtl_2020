@@ -190,15 +190,15 @@ change_indels <- function(data) {
 run_coloc_analysis <- function(PD_GWAS_v2_tidy, GTEx_PD_genes_eQTL_data_tidy_gene_filtered, priors_df, 
                                tissue_formatted, gene_to_filter){
   
-  
-  PD_GWAS_v2_coloc <- 
-    PD_GWAS_v2_tidy %>% 
-    filter(variant_id %in% GTEx_PD_genes_eQTL_data_tidy_gene_filtered$variant_id) %>% 
-    arrange(variant_id)
-  
+ 
   GTEx_PD_genes_eQTL_data_coloc <- 
     GTEx_PD_genes_eQTL_data_tidy_gene_filtered %>% 
-    filter(variant_id %in% PD_GWAS_v2_tidy$variant_id, !duplicated(variant_id)) %>% 
+    filter(variant_id %in% PD_GWAS_v2_tidy$variant_id, !duplicated(variant_id), !is.na(varbeta)) %>% 
+    arrange(variant_id)
+
+  PD_GWAS_v2_coloc <- 
+    PD_GWAS_v2_tidy %>% 
+    filter(variant_id %in% GTEx_PD_genes_eQTL_data_coloc$variant_id) %>% 
     arrange(variant_id)
   
   print(str_c(tissue_formatted, " - ", gene_to_filter, " - filtered ;)" ))
@@ -231,7 +231,7 @@ run_coloc_analysis <- function(PD_GWAS_v2_tidy, GTEx_PD_genes_eQTL_data_tidy_gen
   
   PD_GWAS_v2_coloc <- 
     PD_GWAS_v2_coloc %>% 
-    filter(variant_id %in% GTEx_PD_genes_eQTL_data_coloc_harmonised$variant_id) %>% 
+    filter(variant_id %in% GTEx_PD_genes_eQTL_data_coloc_harmonised$variant_id ) %>% 
     arrange(variant_id)
   
   GTEx_PD_genes_eQTL_data_coloc_harmonised <- 
