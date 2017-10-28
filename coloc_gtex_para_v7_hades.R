@@ -223,7 +223,7 @@ run_coloc_analysis <- function(PD_GWAS_v2_tidy, GTEx_PD_genes_eQTL_data_tidy_gen
                 A1.data = "Al1", A2.data = "Al2", BETA.data="BETA", flip = TRUE)
   
   write_delim(GTEx_PD_genes_eQTL_data_coloc_match_alleles_list[[2]], 
-              str_c("/data/kronos/dzhang/coloc/results/GTEx/GTEx_raw_results_full_v7", "/", tissue_formatted, "/", tissue_formatted, "_", 
+              str_c("/hades/dkia/coloc/results/GTEx/GTEx_raw_results_full_v7", "/", tissue_formatted, "/", tissue_formatted, "_", 
                     gene_to_filter, "_removed_SNPS.csv"), delim = ",")
   
   GTEx_PD_genes_eQTL_data_coloc_harmonised <- 
@@ -329,36 +329,36 @@ save_coloc_results <- function(coloc_results_gene, results_path, tissue_formatte
 
 # Main ------------------------------------------------------------------------------------------------
 
-GTEx_dir <- "/array/dkia/eqtl/gtex/gtex_v7/Brain_regions_gtex_clean_id"
+GTEx_dir <- "/hades/dkia/coloc/gtex_v7/Brain_regions_gtex_clean_id"
 
 GTEx_brain_regions_eQTL_paths <- list.files(GTEx_dir, full.names = T)
 
- coloc_PD_genes_HGNC_symbols_ensembl_38_37 <- 
-   read_delim("/data/kronos/dzhang/coloc/raw_data/GTEx/coloc_PD_genes_HGNC_symbols_ensembl_38_37.csv", delim = ",", 
-              col_types = cols(.default = col_character()))
+ # coloc_PD_genes_HGNC_symbols_ensembl_38_37 <- 
+ #   read_delim("/data/kronos/dzhang/coloc/raw_data/GTEx/coloc_PD_genes_HGNC_symbols_ensembl_38_37.csv", delim = ",", 
+ #              col_types = cols(.default = col_character()))
+# 
+#  coloc_PD_genes_HGNC_symbols_ensembl_38_37_uniq <- 
+#    coloc_PD_genes_HGNC_symbols_ensembl_38_37 %>% 
+#      mutate(HGNC_ensembl = (str_c(hgnc_symbol, "_", ensembl_gene_id))) %>%
+#      filter(!duplicated(HGNC_ensembl)) %>%
+#      as_tibble()
 
- coloc_PD_genes_HGNC_symbols_ensembl_38_37_uniq <- 
-   coloc_PD_genes_HGNC_symbols_ensembl_38_37 %>% 
-     mutate(HGNC_ensembl = (str_c(hgnc_symbol, "_", ensembl_gene_id))) %>%
-     filter(!duplicated(HGNC_ensembl)) %>%
-     as_tibble()
-
-if(!file.exists("/data/kronos/dzhang/coloc/results/GTEx/GTEx_brain_regions_eQTL_df_v7.csv")){
+if(!file.exists("/hades/dkia/coloc/GTEx_brain_regions_eQTL_df_v7.csv")){
 
   GTEx_brain_regions_eQTL_df <- sort_GTEx_brain_regions_eQTL_paths(GTEx_brain_regions_eQTL_paths, coloc_PD_genes_HGNC_symbols_ensembl_38_37)
 
-  write_delim(GTEx_brain_regions_eQTL_df, "/data/kronos/dzhang/coloc/results/GTEx/GTEx_brain_regions_eQTL_df_v7.csv", delim = ",")
+  write_delim(GTEx_brain_regions_eQTL_df, "/hades/dkia/coloc/GTEx_brain_regions_eQTL_df_v7.csv", delim = ",")
 
 }else{
 
-  GTEx_brain_regions_eQTL_df <- read_delim("/data/kronos/dzhang/coloc/results/GTEx/GTEx_brain_regions_eQTL_df_v7.csv", delim = ",")
+  GTEx_brain_regions_eQTL_df <- read_delim("/hades/dkia/coloc/GTEx_brain_regions_eQTL_df_v7.csv", delim = ",")
 
 }
 
 priors_df <- generate_parameters_df(p1_or_p2 = c(1e-04, 1e-05), prob_shared = c(0.01, 0.02, 0.1), 
                               PD_cc_ratio = c(average_PD_cc_ratio, max_PD_cc_ratio, min_PD_cc_ratio, meta_ratio))
 
-PD_GWAS_v2_tidy <- read_delim("/data/kronos/dzhang/coloc/raw_data/pd_newmeta_refallele.txt", delim = "\t",
+PD_GWAS_v2_tidy <- read_delim("/hades/dkia/coloc/pd_newmeta_refallele.txt", delim = "\t",
                          col_types = cols(.default = col_character()))
 
 PD_GWAS_v2_tidy <- format_PD_GWAS(PD_GWAS_v2_tidy)
@@ -370,7 +370,7 @@ for(i in seq_along(GTEx_brain_regions_eQTL_df$path)){
   path <- GTEx_brain_regions_eQTL_df$path[i]
   tissue_formatted <- GTEx_brain_regions_eQTL_df$tissue[i] %>% str_replace_all(" ", "_") %>% str_replace_all("\\.txt", "")
   
-  make_results_dir(results_path = "/data/kronos/dzhang/coloc/results/GTEx/GTEx_raw_results_full_v7", tissue_formatted)
+  make_results_dir(results_path = "/hades/dkia/coloc/results/GTEx/GTEx_raw_results_full_v7", tissue_formatted)
   
   GTEx_PD_genes_eQTL_data_tidy <- import_GTEx_eQTL(path)
   GTEx_PD_genes_eQTL_data_tidy <- format_GTEx_eQTL(GTEx_PD_genes_eQTL_data_tidy)
@@ -415,7 +415,7 @@ for(i in seq_along(GTEx_brain_regions_eQTL_df$path)){
       }
       print(str_c(tissue_formatted, " - ", index, " - ", gene_to_filter, " finished"))
       
-      save_coloc_results(coloc_results_gene, results_path = "/data/kronos/dzhang/coloc/results/GTEx/GTEx_raw_results_full_v7", tissue_formatted, gene_to_filter)
+      save_coloc_results(coloc_results_gene, results_path = "/hades/dkia/coloc/results/GTEx/GTEx_raw_results_full_v7", tissue_formatted, gene_to_filter)
       
     }else{
       
